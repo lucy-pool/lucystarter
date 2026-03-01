@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@auth/core": "^0.34.3",
+    "@auth/core": "0.37.4",
     "@convex-dev/auth": "0.0.91",
     "@convex-dev/r2": "0.9.1",
     "@radix-ui/react-alert-dialog": "^1.1.15",
