@@ -1,0 +1,89 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { LayoutDashboard, StickyNote, Upload, Bot, Table2 } from "lucide-react";
+import { cn, APP_NAME } from "@/lib/utils";
+
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+  demo?: boolean;
+}
+
+// ── Navigation ──────────────────────────────────────────────────────
+// Add your own routes here as you build features.
+const navItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: <LayoutDashboard className="h-5 w-5" />,
+  },
+  {
+    label: "Notes",
+    href: "/notes",
+    icon: <StickyNote className="h-5 w-5" />,
+    demo: true,
+  },
+  {
+    label: "Files",
+    href: "/files",
+    icon: <Upload className="h-5 w-5" />,
+    demo: true,
+  },
+  {
+    label: "AI Chat",
+    href: "/ai-chat",
+    icon: <Bot className="h-5 w-5" />,
+    demo: true,
+  },
+  {
+    label: "DataGrid",
+    href: "/data-grid-demo",
+    icon: <Table2 className="h-5 w-5" />,
+    demo: true,
+  },
+];
+
+export function Sidebar() {
+  const pathname = usePathname();
+
+  return (
+    <aside className="flex h-full w-64 flex-col bg-sidebar-bg text-sidebar-text border-r border-sidebar-border">
+      {/* Logo / App Name */}
+      <div className="flex h-16 items-center px-6 border-b border-sidebar-border">
+        <Link href="/dashboard" className="text-lg font-bold">
+          {APP_NAME}
+        </Link>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1 px-3 py-4">
+        {navItems.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            pathname.startsWith(item.href + "/");
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                isActive
+                  ? "bg-sidebar-bg-hover text-sidebar-active"
+                  : "text-sidebar-text-muted hover:bg-sidebar-bg-hover hover:text-sidebar-text"
+              )}
+            >
+              {item.icon}
+              {item.label}
+              {item.demo && (
+                <span className="text-xs text-muted-foreground">(demo)</span>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}
