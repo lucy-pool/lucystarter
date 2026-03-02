@@ -47,7 +47,7 @@ export const chat = action({
       throw new Error("OPENROUTER_API_KEY not configured. Set it in the Convex dashboard.");
     }
 
-    const model = args.model || process.env.DEFAULT_OPENROUTER_MODEL || "mistralai/devstral-2512:free";
+    const model = args.model || process.env.DEFAULT_OPENROUTER_MODEL || "google/gemini-3-flash-preview";
 
     const messages: ChatMessage[] = [];
 
