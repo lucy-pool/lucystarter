@@ -28,6 +28,8 @@ export default function SignInPage() {
     setLoading(true);
     try {
       await signIn("password", { email, password, flow: "signIn" });
+      // Hard navigation ensures the proxy middleware runs fresh with the new auth cookie
+      window.location.href = "/dashboard";
     } catch {
       setError("Invalid email or password.");
     } finally {

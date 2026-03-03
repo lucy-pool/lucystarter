@@ -11,7 +11,9 @@
 import type * as ai from "../ai.js";
 import type * as aiActions from "../aiActions.js";
 import type * as auth from "../auth.js";
+import type * as authHelpers from "../authHelpers.js";
 import type * as files from "../files.js";
+import type * as http from "../http.js";
 import type * as notes from "../notes.js";
 import type * as r2 from "../r2.js";
 import type * as r2Actions from "../r2Actions.js";
@@ -27,7 +29,9 @@ declare const fullApi: ApiFromModules<{
   ai: typeof ai;
   aiActions: typeof aiActions;
   auth: typeof auth;
+  authHelpers: typeof authHelpers;
   files: typeof files;
+  http: typeof http;
   notes: typeof notes;
   r2: typeof r2;
   r2Actions: typeof r2Actions;

@@ -29,6 +29,8 @@ export default function SignUpPage() {
     setLoading(true);
     try {
       await signIn("password", { email, password, name, flow: "signUp" });
+      // Hard navigation ensures the proxy middleware runs fresh with the new auth cookie
+      window.location.href = "/dashboard";
     } catch {
       setError("Could not create account. Try a different email.");
     } finally {

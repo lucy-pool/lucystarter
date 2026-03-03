@@ -24,7 +24,7 @@ export function UserMenu() {
         </span>
       </div>
       <button
-        onClick={() => void signOut()}
+        onClick={() => void signOut().catch(() => {}).finally(() => { window.location.href = "/signin"; })}
         className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         title="Sign out"
       >

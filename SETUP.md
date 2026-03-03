@@ -1,11 +1,10 @@
 # Setup Guide
 
-Get the Convex + Clerk starter running locally.
+Get the Next.js + Convex Auth starter running locally.
 
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (or Node.js 18+)
-- A [Clerk](https://clerk.com/) account
 - A [Convex](https://convex.dev/) account
 
 ## 1. Install dependencies
@@ -14,30 +13,7 @@ Get the Convex + Clerk starter running locally.
 bun install
 ```
 
-## 2. Set up Clerk
-
-1. Go to [dashboard.clerk.com](https://dashboard.clerk.com) and create a new application
-2. In your Clerk dashboard, go to **JWT Templates** and create a new template:
-   - Name: `convex`
-   - Issuer: leave as default (this is your `CLERK_JWT_ISSUER_DOMAIN`)
-3. Copy your keys from **API Keys** in the Clerk dashboard
-
-## 3. Create environment file
-
-```bash
-cp .env.example .env.local
-```
-
-Fill in the Clerk values:
-
-```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-```
-
-The `CONVEX_DEPLOYMENT` and `NEXT_PUBLIC_CONVEX_URL` values are auto-filled when you run `bunx convex dev` for the first time.
-
-## 4. Start Convex
+## 2. Start Convex
 
 ```bash
 bunx convex dev
@@ -49,15 +25,21 @@ On first run, this will:
 - Push the schema and functions
 - Auto-fill `CONVEX_DEPLOYMENT` and `NEXT_PUBLIC_CONVEX_URL` in `.env.local`
 
-## 5. Set the Clerk JWT issuer domain in Convex
+## 3. Initialize Convex Auth
+
+This step generates the `JWT_PRIVATE_KEY` and `JWKS` environment variables that Convex Auth needs to sign and verify tokens. **You must run this once on first setup** — without it, sign-up and sign-in will fail with `Missing environment variable` errors.
 
 ```bash
-bunx convex env set CLERK_JWT_ISSUER_DOMAIN https://your-domain.clerk.accounts.dev
+npx @convex-dev/auth
 ```
 
-Replace `your-domain` with the issuer domain from your Clerk dashboard (found under **JWT Templates** > `convex`).
+This will automatically:
+- Set `SITE_URL` in your Convex deployment
+- Generate and set `JWT_PRIVATE_KEY` (RSA private key for signing JWTs)
+- Generate and set `JWKS` (public key for verifying JWTs)
+- Verify your auth config files are correct
 
-## 6. Start Next.js
+## 4. Start Next.js
 
 In a second terminal:
 
@@ -65,7 +47,30 @@ In a second terminal:
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — you should see the landing page. Sign up to access the dashboard.
+Open [http://localhost:3000](http://localhost:3000) — you should see the landing page. Sign up with email/password to access the dashboard.
+
+## Optional: GitHub OAuth
+
+1. Create a GitHub OAuth App at [github.com/settings/developers](https://github.com/settings/developers)
+   - Homepage URL: `http://localhost:3000`
+   - Callback URL: your Convex site URL + `/api/auth/callback/github` (find your site URL with `bunx convex env get SITE_URL`)
+2. Set the env vars in Convex:
+
+```bash
+bunx convex env set AUTH_GITHUB_ID your-github-client-id
+bunx convex env set AUTH_GITHUB_SECRET your-github-client-secret
+```
+
+## Optional: Google OAuth
+
+1. Create credentials in [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   - Authorized redirect URI: your Convex site URL + `/api/auth/callback/google`
+2. Set the env vars in Convex:
+
+```bash
+bunx convex env set AUTH_GOOGLE_ID your-google-client-id
+bunx convex env set AUTH_GOOGLE_SECRET your-google-client-secret
+```
 
 ## Optional: Cloudflare R2 (file uploads)
 
@@ -75,7 +80,7 @@ File uploads use the `@convex-dev/r2` component with Cloudflare R2 storage. File
 
 1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → **R2** → **Overview**
 2. Click **Create Bucket**
-3. Name it (e.g. `convex-clerk-starter-main`) and create
+3. Name it (e.g. `convex-starter-uploads`) and create
 
 ### 2. Create an R2 API token
 
@@ -135,8 +140,10 @@ Browse available models at [openrouter.ai/models](https://openrouter.ai/models).
 
 | Problem | Fix |
 |---------|-----|
-| `CLERK_JWT_ISSUER_DOMAIN` error | Make sure you set it as a Convex env var (step 5), not in `.env.local` |
-| Auth not working | Verify the Clerk JWT template is named exactly `convex` |
+| `Missing environment variable JWT_PRIVATE_KEY` | Run `npx @convex-dev/auth` (step 3) |
+| `Missing environment variable JWKS` | Run `npx @convex-dev/auth` (step 3) — it sets both keys |
+| Auth not working after sign-up | Check that both `JWT_PRIVATE_KEY` and `JWKS` are set: `bunx convex env list` |
+| OAuth redirect errors | Verify callback URLs match your Convex site URL |
 | File uploads failing | Check all 4 R2 env vars are set in Convex dashboard and CORS is configured on the bucket |
 | AI chat error | Verify `OPENROUTER_API_KEY` is set in Convex dashboard |
 | `bunx convex dev` won't start | Run `bun install` first, ensure you're logged in to Convex |
