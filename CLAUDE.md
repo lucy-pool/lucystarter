@@ -73,8 +73,9 @@ src/components/
 src/lib/
   utils.ts                       # cn() utility
 
-claude-hooks/
-  index.ts                       # Stop hook: typecheck + lint + MCP error check + diagram updates
+.claude/hooks/
+  stop-hook.ts                   # Stop hook: typecheck + lint + MCP error check + diagram updates
+  block-*.sh                     # PreToolUse hooks: enforce CLI tool usage rules
 
 memory/ai/diagrams/              # Auto-maintained architecture diagrams
   schema.md                      # ER diagram of all tables
@@ -83,7 +84,7 @@ memory/ai/diagrams/              # Auto-maintained architecture diagrams
   data-flow.md                   # Client → Convex → R2/OpenRouter data flow
 ```
 
-## Stop Hook (`claude-hooks/index.ts`)
+## Stop Hook (`.claude/hooks/stop-hook.ts`)
 
 Runs automatically after every Claude Code turn that edits files. Blocks until issues are fixed.
 

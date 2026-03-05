@@ -5,7 +5,7 @@ import {
 } from "@convex-dev/auth/nextjs/server";
 import { NextFetchEvent, NextRequest } from "next/server";
 
-const isPublicRoute = createRouteMatcher(["/", "/signin", "/signup", "/api/auth(.*)"]);
+const isPublicRoute = createRouteMatcher(["/", "/signin", "/signup", "/forgot-password", "/api/auth(.*)"]);
 
 const handler = convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
   if (!isPublicRoute(request) && !(await convexAuth.isAuthenticated())) {

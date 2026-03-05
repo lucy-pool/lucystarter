@@ -1,0 +1,50 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-file-reading.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-file-editing.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-content-search.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-file-search.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-npm-yarn.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-no-verify.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-destructive.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run .claude/hooks/stop-hook.ts"
+          }
+        ]
+      }
+    ]
+  }
+}

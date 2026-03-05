@@ -97,8 +97,9 @@ src/components/
 src/lib/
   utils.ts                     # cn() class merging utility
 
-claude-hooks/
-  index.ts                     # Stop hook: typecheck, lint, diagram updates
+.claude/hooks/
+  stop-hook.ts                 # Stop hook: typecheck, lint, diagram updates
+  block-*.sh                   # PreToolUse hooks: enforce CLI tool usage rules
 
 memory/ai/diagrams/            # Auto-maintained architecture docs
   schema.md
