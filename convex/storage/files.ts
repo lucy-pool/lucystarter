@@ -1,7 +1,7 @@
 import { v } from "convex/values";
-import { fileTypeValidator } from "./schema";
+import { fileTypeValidator } from "../schema";
 import { r2 } from "./r2";
-import { userQuery, userMutation } from "./functions";
+import { userQuery, userMutation } from "../functions";
 
 // ── File metadata CRUD ──────────────────────────────────────────────
 // Stores metadata after a successful R2 upload.

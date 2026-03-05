@@ -13,10 +13,10 @@ import { toast } from "@/components/ui/use-toast";
 // Flow: save user msg → call OpenRouter action → save assistant msg
 
 export default function AiChatPage() {
-  const messages = useQuery(api.ai.listMessages);
-  const saveMessage = useMutation(api.ai.saveMessage);
-  const clearHistory = useMutation(api.ai.clearHistory);
-  const chat = useAction(api.aiActions.chat);
+  const messages = useQuery(api.ai.messages.listMessages);
+  const saveMessage = useMutation(api.ai.messages.saveMessage);
+  const clearHistory = useMutation(api.ai.messages.clearHistory);
+  const chat = useAction(api.ai.chat.chat);
 
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);

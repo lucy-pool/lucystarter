@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { messageRoleValidator } from "./schema";
-import { userQuery, userMutation } from "./functions";
+import { messageRoleValidator } from "../schema";
+import { userQuery, userMutation } from "../functions";
 
 // ── AI message history ──────────────────────────────────────────────
 // Stores chat messages so conversations persist across page loads.

@@ -35,12 +35,26 @@ convex/                          # Backend
   http.ts                        # HTTP router — Convex Auth routes
   users.ts                       # User CRUD (no auto-provisioning — Convex Auth handles it)
   convex.config.ts               # App definition — registers R2 component
-  files.ts                       # File metadata CRUD
-  r2.ts                          # R2 client + clientApi exports (generateUploadUrl, syncMetadata)
-  r2Actions.ts                   # "use node" — R2 presigned download URLs
-  ai.ts                          # AI message history CRUD
-  aiActions.ts                   # "use node" — OpenRouter chat completions
   notes.ts                       # Demo CRUD (delete me)
+
+  email/                         # Email service (deep module)
+    send.ts                      # sendEmail, resendEmail (api.email.send.*)
+    logs.ts                      # createEmailLog, updateEmailLog, checkIsAdmin, getEmailLogInternal, listEmailLogs
+    templates.ts                 # list, get, getInternal, create, update, remove, duplicate (api.email.templates.*)
+    actions.ts                   # "use node" — processEmail, getEmailConfig (api.email.actions.*)
+    templateActions.ts           # "use node" — previewTemplate (api.email.templateActions.*)
+    provider.ts                  # "use node" utility — no function exports
+    render.ts                    # "use node" utility — no function exports
+    builtinTemplates.tsx         # "use node" utility — React Email templates
+
+  storage/                       # Storage service (deep module)
+    files.ts                     # storeFileMetadata, getMyFiles, deleteFile (api.storage.files.*)
+    r2.ts                        # R2 client + clientApi (api.storage.r2.*)
+    downloads.ts                 # "use node" — generateDownloadUrl (api.storage.downloads.*)
+
+  ai/                            # AI service (deep module)
+    messages.ts                  # listMessages, saveMessage, clearHistory (api.ai.messages.*)
+    chat.ts                      # "use node" — chat action (api.ai.chat.*)
 
 src/
   proxy.ts                       # Convex Auth middleware — route protection

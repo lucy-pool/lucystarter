@@ -1,11 +1,11 @@
 "use node";
 
-import { action, internalAction } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { action, internalAction } from "../_generated/server";
+import { internal } from "../_generated/api";
 import { v } from "convex/values";
-import { renderTemplate } from "./emailTemplates";
-import { getEmailProvider } from "./emailProvider";
-import { renderCustomTemplate } from "./customTemplateRender";
+import { renderTemplate } from "./builtinTemplates";
+import { getEmailProvider } from "./provider";
+import { renderCustomTemplate } from "./render";
 
 // ── Process email action ────────────────────────────────────────────
 // Reads log → renders template → sends via provider → updates log.
@@ -14,7 +14,7 @@ export const processEmail = internalAction({
   args: { logId: v.id("emailLogs") },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const log = await ctx.runQuery(internal.emails.getEmailLogInternal, {
+    const log = await ctx.runQuery(internal.email.logs.getEmailLogInternal, {
       logId: args.logId,
     });
 
@@ -32,7 +32,7 @@ export const processEmail = internalAction({
       if (log.template === "custom" && log.customTemplateId) {
         // Custom template: fetch from DB and render
         const template = await ctx.runQuery(
-          internal.customTemplates.getInternal,
+          internal.email.templates.getInternal,
           { templateId: log.customTemplateId }
         );
         if (!template) throw new Error("Custom template not found");
@@ -66,7 +66,7 @@ export const processEmail = internalAction({
       });
 
       // Update log as sent
-      await ctx.runMutation(internal.emails.updateEmailLog, {
+      await ctx.runMutation(internal.email.logs.updateEmailLog, {
         logId: args.logId,
         status: "sent",
         subject,
@@ -80,7 +80,7 @@ export const processEmail = internalAction({
       console.error(`Failed to send email ${args.logId}:`, errorMessage);
 
       // Update log as failed
-      await ctx.runMutation(internal.emails.updateEmailLog, {
+      await ctx.runMutation(internal.email.logs.updateEmailLog, {
         logId: args.logId,
         status: "failed",
         error: errorMessage,
@@ -121,7 +121,7 @@ export const getEmailConfig = action({
     if (!identity) {
       throw new Error("Authentication required");
     }
-    const isAdmin = await ctx.runQuery(internal.emails.checkIsAdmin);
+    const isAdmin = await ctx.runQuery(internal.email.logs.checkIsAdmin);
     if (!isAdmin) {
       throw new Error("Admin access required");
     }

@@ -109,11 +109,11 @@ export default function AdminEmailTemplatesPage() {
 // ── List View ────────────────────────────────────────────────────────
 
 function TemplateList({ onNavigate }: { onNavigate: (view: View) => void }) {
-  const templates = useQuery(api.customTemplates.list) as
+  const templates = useQuery(api.email.templates.list) as
     | Template[]
     | undefined;
-  const duplicateTemplate = useMutation(api.customTemplates.duplicate);
-  const removeTemplate = useMutation(api.customTemplates.remove);
+  const duplicateTemplate = useMutation(api.email.templates.duplicate);
+  const removeTemplate = useMutation(api.email.templates.remove);
   const { toast } = useToast();
 
   const handleDuplicate = async (templateId: Id<"emailTemplates">) => {
@@ -283,14 +283,14 @@ function TemplateEditor({
   onBack: () => void;
 }) {
   const existing = useQuery(
-    api.customTemplates.get,
+    api.email.templates.get,
     templateId ? { templateId } : "skip"
   ) as Template | null | undefined;
 
-  const createTemplate = useMutation(api.customTemplates.create);
-  const updateTemplate = useMutation(api.customTemplates.update);
+  const createTemplate = useMutation(api.email.templates.create);
+  const updateTemplate = useMutation(api.email.templates.update);
   const previewTemplate = useAction(
-    api.customTemplateActions.previewTemplate
+    api.email.templateActions.previewTemplate
   );
   const { toast } = useToast();
 

@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { adminQuery, adminMutation } from "./functions";
-import { internalQuery } from "./_generated/server";
+import { adminQuery, adminMutation } from "../functions";
+import { internalQuery } from "../_generated/server";
 
 // ── Shared validator for template documents ─────────────────────────
 

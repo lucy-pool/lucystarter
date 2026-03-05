@@ -8,23 +8,24 @@
  * @module
  */
 
-import type * as ai from "../ai.js";
-import type * as aiActions from "../aiActions.js";
+import type * as ai_chat from "../ai/chat.js";
+import type * as ai_messages from "../ai/messages.js";
 import type * as auth from "../auth.js";
 import type * as authHelpers from "../authHelpers.js";
-import type * as customTemplateActions from "../customTemplateActions.js";
-import type * as customTemplateRender from "../customTemplateRender.js";
-import type * as customTemplates from "../customTemplates.js";
-import type * as emailActions from "../emailActions.js";
-import type * as emailProvider from "../emailProvider.js";
-import type * as emailTemplates from "../emailTemplates.js";
-import type * as emails from "../emails.js";
-import type * as files from "../files.js";
+import type * as email_actions from "../email/actions.js";
+import type * as email_builtinTemplates from "../email/builtinTemplates.js";
+import type * as email_logs from "../email/logs.js";
+import type * as email_provider from "../email/provider.js";
+import type * as email_render from "../email/render.js";
+import type * as email_send from "../email/send.js";
+import type * as email_templateActions from "../email/templateActions.js";
+import type * as email_templates from "../email/templates.js";
 import type * as functions from "../functions.js";
 import type * as http from "../http.js";
 import type * as notes from "../notes.js";
-import type * as r2 from "../r2.js";
-import type * as r2Actions from "../r2Actions.js";
+import type * as storage_downloads from "../storage/downloads.js";
+import type * as storage_files from "../storage/files.js";
+import type * as storage_r2 from "../storage/r2.js";
 import type * as users from "../users.js";
 
 import type {
@@ -34,23 +35,24 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  ai: typeof ai;
-  aiActions: typeof aiActions;
+  "ai/chat": typeof ai_chat;
+  "ai/messages": typeof ai_messages;
   auth: typeof auth;
   authHelpers: typeof authHelpers;
-  customTemplateActions: typeof customTemplateActions;
-  customTemplateRender: typeof customTemplateRender;
-  customTemplates: typeof customTemplates;
-  emailActions: typeof emailActions;
-  emailProvider: typeof emailProvider;
-  emailTemplates: typeof emailTemplates;
-  emails: typeof emails;
-  files: typeof files;
+  "email/actions": typeof email_actions;
+  "email/builtinTemplates": typeof email_builtinTemplates;
+  "email/logs": typeof email_logs;
+  "email/provider": typeof email_provider;
+  "email/render": typeof email_render;
+  "email/send": typeof email_send;
+  "email/templateActions": typeof email_templateActions;
+  "email/templates": typeof email_templates;
   functions: typeof functions;
   http: typeof http;
   notes: typeof notes;
-  r2: typeof r2;
-  r2Actions: typeof r2Actions;
+  "storage/downloads": typeof storage_downloads;
+  "storage/files": typeof storage_files;
+  "storage/r2": typeof storage_r2;
   users: typeof users;
 }>;
 

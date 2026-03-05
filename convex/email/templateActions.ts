@@ -1,10 +1,10 @@
 "use node";
 
 // eslint-disable-next-line no-restricted-imports -- actions require manual auth check
-import { action } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { action } from "../_generated/server";
+import { internal } from "../_generated/api";
 import { v } from "convex/values";
-import { renderCustomTemplate } from "./customTemplateRender";
+import { renderCustomTemplate } from "./render";
 
 /** Preview a custom template by rendering to HTML. Admin only. */
 export const previewTemplate = action({
@@ -20,7 +20,7 @@ export const previewTemplate = action({
     // Manual admin auth check (actions can't use adminQuery builders)
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Authentication required");
-    const isAdmin = await ctx.runQuery(internal.emails.checkIsAdmin);
+    const isAdmin = await ctx.runQuery(internal.email.logs.checkIsAdmin);
     if (!isAdmin) throw new Error("Admin access required");
 
     const variables = JSON.parse(args.variables) as Record<string, string>;

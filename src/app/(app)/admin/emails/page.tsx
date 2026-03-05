@@ -113,9 +113,9 @@ const templateStyles: Record<string, string> = {
 };
 
 export default function AdminEmailsPage() {
-  const logs = useQuery(api.emails.listEmailLogs) as EmailLog[] | undefined;
-  const resend = useMutation(api.emails.resendEmail);
-  const getEmailConfig = useAction(api.emailActions.getEmailConfig);
+  const logs = useQuery(api.email.logs.listEmailLogs) as EmailLog[] | undefined;
+  const resend = useMutation(api.email.send.resendEmail);
+  const getEmailConfig = useAction(api.email.actions.getEmailConfig);
   const { toast } = useToast();
   const [emailConfig, setEmailConfig] = useState<EmailConfig | null>(null);
 

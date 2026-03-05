@@ -74,7 +74,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 
       await ctx.scheduler.runAfter(
         0,
-        internal.emails.createEmailLog,
+        internal.email.logs.createEmailLog,
         {
           to: user.email,
           template: "welcome" as const,

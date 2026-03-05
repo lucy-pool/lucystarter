@@ -14,11 +14,11 @@ import { formatBytes, getFileType } from "@/lib/utils";
 // Flow: generateUploadUrl → PUT to R2 → syncMetadata → storeFileMetadata
 
 export default function FilesPage() {
-  const files = useQuery(api.files.getMyFiles);
-  const uploadFile = useUploadFile(api.r2);
-  const generateDownloadUrl = useAction(api.r2Actions.generateDownloadUrl);
-  const storeMetadata = useMutation(api.files.storeFileMetadata);
-  const deleteFileMutation = useMutation(api.files.deleteFile);
+  const files = useQuery(api.storage.files.getMyFiles);
+  const uploadFile = useUploadFile(api.storage.r2);
+  const generateDownloadUrl = useAction(api.storage.downloads.generateDownloadUrl);
+  const storeMetadata = useMutation(api.storage.files.storeFileMetadata);
+  const deleteFileMutation = useMutation(api.storage.files.deleteFile);
 
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);

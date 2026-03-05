@@ -106,7 +106,7 @@ function getConvexTsFiles(convexDir: string): { filePath: string; relPath: strin
         walk(fullPath);
       } else if (
         entry.isFile() &&
-        entry.name.endsWith(".ts") &&
+        (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) &&
         !entry.name.endsWith(".d.ts") &&
         entry.name !== "tsconfig.json"
       ) {
@@ -191,6 +191,9 @@ function checkClientImportsInConvex(cwd: string): string[] {
       continue;
     }
 
+    // "use node" files run in Node.js and may legitimately use React (e.g. @react-email)
+    if (/^["']use node["'];?\s*$/m.test(content)) continue;
+
     const importRegex = /import\s+.*?\s+from\s+["']([^"']+)["']/g;
     let match: RegExpExecArray | null;
     while ((match = importRegex.exec(content)) !== null) {
@@ -228,7 +231,7 @@ async function parseMcpResponse(res: Response): Promise<unknown> {
   return res.json();
 }
 
-async function checkNextJsMcpErrors(): Promise<string | null> {
+async function checkNextJsMcpErrors(cwd: string): Promise<string | null> {
   const MCP_URL = "http://localhost:3000/_next/mcp";
   const jsonHeaders = {
     "Content-Type": "application/json",
@@ -294,8 +297,16 @@ async function checkNextJsMcpErrors(): Promise<string | null> {
       .join("\n");
 
     if (text.includes("No errors detected")) return null;
-    if (text.includes("Found errors")) return text;
-    return null;
+    if (!text.includes("Found errors")) return null;
+
+    // Filter out errors referencing source files that don't exist in this project
+    // (e.g. stale browser tabs from other projects on the same port)
+    const fileRefs = Array.from(text.matchAll(/\(((?:[^)]|\([^)]*\))+\.(tsx?|jsx?)):\d+:\d+\)/g));
+    if (fileRefs.length > 0) {
+      const hasRelevantError = fileRefs.some((m) => existsSync(join(cwd, m[1])));
+      if (!hasRelevantError) return null;
+    }
+    return text;
   } catch {
     // Server not running or MCP unavailable — skip gracefully
     return null;
@@ -320,7 +331,7 @@ const DIAGRAM_MAPPINGS: DiagramMapping[] = [
   },
   {
     diagram: "functions.md",
-    patterns: [/convex\/(?!schema\.)[^/]+\.ts$/],
+    patterns: [/convex\/(?!schema\.)[^/]+\.tsx?$/, /convex\/(?:email|storage|ai)\/[^/]+\.tsx?$/],
   },
   {
     diagram: "auth-flow.md",
@@ -337,7 +348,8 @@ const DIAGRAM_MAPPINGS: DiagramMapping[] = [
   {
     diagram: "data-flow.md",
     patterns: [
-      /convex\/[^/]+\.ts$/,
+      /convex\/[^/]+\.tsx?$/,
+      /convex\/(?:email|storage|ai)\/[^/]+\.tsx?$/,
       /src\/app\/.*\/page\.tsx$/,
       /src\/components\/[^/]+\.tsx$/,
     ],
@@ -423,7 +435,7 @@ async function main() {
 
   // --- Check 5: Next.js MCP runtime errors ---
   console.error("Checking Next.js MCP for runtime errors...");
-  const mcpErrors = await checkNextJsMcpErrors();
+  const mcpErrors = await checkNextJsMcpErrors(input.cwd);
   if (mcpErrors) {
     block(`Next.js runtime errors detected via MCP:\n${mcpErrors}`);
     return;
