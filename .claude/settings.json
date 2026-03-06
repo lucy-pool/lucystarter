@@ -35,6 +35,14 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/check-untested-functions.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-temporal-coupling.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-diagrams.sh"
           }
         ]
       }

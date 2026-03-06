@@ -106,13 +106,34 @@ src/lib/
   stop-hook.ts                   # Stop hook: typecheck + lint + MCP error check + diagram updates
   block-*.sh                     # PreToolUse hooks: enforce CLI tool usage rules
   check-untested-functions.sh    # PreToolUse hook: warn about untested Convex functions on git commit
+  check-temporal-coupling.sh     # PreToolUse hook: warn about cross-module temporal coupling on git commit
 
 memory/ai/diagrams/              # Auto-maintained architecture diagrams
   schema.md                      # ER diagram of all tables
   functions.md                   # All Convex functions with auth + table access
   auth-flow.md                   # Authentication sequence diagrams
   data-flow.md                   # Client → Convex → R2/OpenRouter data flow
+  greybox.md                     # Deep module boundaries, public APIs vs internals
 ```
+
+## Design Principles
+
+### The Greybox Principle
+
+Design modules to be **"Accessible but Irrelevant"** — implementation details are accessible when needed, but irrelevant to the rest of the system during standard operation. Full reference: `docs/design/greybox_principle.md`
+
+**Three-Question Checklist** (evaluate every module):
+
+| Question | Test |
+|----------|------|
+| **Deep?** | Does a simple interface hide significant internal complexity? |
+| **Opaque?** | Can you swap internals without touching files that *use* the module? |
+| **Outcome-Focused?** | Do tests assert results rather than mocking internal steps? |
+
+**Two Heuristics** for finding broken seams:
+
+- **Change Gravity:** If changing one internal decision requires updating 3+ files, the seam is too thin — move logic deeper.
+- **Temporal Coupling:** If files always change together in commits (`git log --name-only`), they belong in the same module boundary.
 
 ## Stop Hook (`.claude/hooks/stop-hook.ts`)
 
@@ -127,7 +148,9 @@ Runs automatically after every Claude Code turn that edits files. Blocks until i
 | 4. Client-only packages | Lint: React/Next.js imports in `convex/` server code |
 | 5. Next.js MCP errors | Queries `localhost:3000/_next/mcp` for build/runtime errors (skipped if dev server not running) |
 
-**Pre-commit warning:** `check-untested-functions.sh` runs on `git commit` and warns (non-blocking) about exported Convex functions with no test references.
+**Pre-commit warnings** (non-blocking, run on `git commit`):
+- `check-untested-functions.sh` — warns about exported Convex functions with no test references
+- `check-temporal-coupling.sh` — warns about files in different modules that always change together (Greybox Principle)
 
 After all checks pass, spawns a background agent to update architecture diagrams.
 
@@ -178,14 +201,15 @@ Browser automation skill for testing, validation, and visual verification. Invok
 
 **Usage**: Use to visually verify UI changes, test user flows end-to-end, take screenshots, and fill forms. For runtime/build error detection, use the Next.js MCP server (`get_errors`) instead. Full docs in `.claude/skills/agent-browser/SKILL.md`.
 
-## Diagrams (source of truth for schema, functions, auth, data flow)
+## Diagrams (source of truth for schema, functions, auth, data flow, module boundaries)
 
-Auto-maintained by the Stop hook. **Read these before making changes** — they contain the full details on tables, indexes, auth guards, R2 upload flow, AI chat flow, and all Convex function signatures.
+Auto-maintained by the Stop hook. **Read these before making changes** — they contain the full details on tables, indexes, auth guards, R2 upload flow, AI chat flow, all Convex function signatures, and deep module boundaries (Greybox).
 
 - `memory/ai/diagrams/schema.md` — ER diagram, indexes, roles, validators
 - `memory/ai/diagrams/functions.md` — All Convex functions, auth guards, table access, flow diagrams
 - `memory/ai/diagrams/auth-flow.md` — Sign-in sequence, route protection, JWT flow
 - `memory/ai/diagrams/data-flow.md` — Reactive queries, R2 upload flow, AI chat flow, key patterns
+- `memory/ai/diagrams/greybox.md` — Deep module boundaries, public APIs vs internals, swap tests
 
 ## Security: Auth Guarding Rules
 
@@ -244,8 +268,10 @@ Auth is enforced **automatically** via custom function builders from `convex/fun
 4. Create `src/app/(app)/your-feature/page.tsx` (`"use client"` directive)
 5. Add nav entry in `src/components/layout/sidebar.tsx`
 6. Add tests in `convex/<service>/__tests__/` for new queries/mutations
-7. Run `bunx convex dev` to push schema
-8. Type-check: `bunx tsc --noEmit`
+7. New module? Passes the Greybox checklist (Deep, Opaque, Outcome-Focused)
+8. Identified the seam? Public interface defined before implementation
+9. Run `bunx convex dev` to push schema
+10. Type-check: `bunx tsc --noEmit`
 
 ## Adding a Role
 

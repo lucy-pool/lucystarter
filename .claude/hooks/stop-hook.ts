@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import { existsSync, readFileSync, readdirSync } from "fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync, unlinkSync, statSync } from "fs";
 import { join } from "path";
 
 interface HookInput {
@@ -316,6 +316,8 @@ async function checkNextJsMcpErrors(cwd: string): Promise<string | null> {
 // ── Diagram maintenance ─────────────────────────────────────────────
 
 const DIAGRAM_DIR = "memory/ai/diagrams";
+const DIAGRAM_LOCK_FILE = "/tmp/lucystarter-diagram-update.lock";
+const DEBOUNCE_SECONDS = 30;
 
 interface DiagramMapping {
   diagram: string;
@@ -354,7 +356,34 @@ const DIAGRAM_MAPPINGS: DiagramMapping[] = [
       /src\/components\/[^/]+\.tsx$/,
     ],
   },
+  {
+    diagram: "greybox.md",
+    patterns: [
+      /convex\/[a-z][a-z-]+\/[^/]+\.tsx?$/,
+      /convex\/functions\.ts$/,
+      /convex\/authHelpers\.ts$/,
+    ],
+  },
 ];
+
+function isDiagramUpdateDebounced(): boolean {
+  try {
+    if (!existsSync(DIAGRAM_LOCK_FILE)) return false;
+    const stat = statSync(DIAGRAM_LOCK_FILE);
+    const ageSeconds = (Date.now() - stat.mtimeMs) / 1000;
+    return ageSeconds < DEBOUNCE_SECONDS;
+  } catch {
+    return false;
+  }
+}
+
+function touchLockFile(): void {
+  try {
+    writeFileSync(DIAGRAM_LOCK_FILE, String(process.pid));
+  } catch {
+    // Best-effort
+  }
+}
 
 function getAffectedDiagrams(changedFiles: string[], cwd: string): string[] {
   const affected = new Set<string>();
@@ -458,42 +487,50 @@ async function main() {
   const diagramsExist = existsSync(diagramDir);
 
   if (affectedDiagrams.length > 0 && diagramsExist) {
-    const existingDiagrams = affectedDiagrams.filter((d) =>
-      existsSync(join(diagramDir, d))
-    );
-    const missingDiagrams = affectedDiagrams.filter(
-      (d) => !existsSync(join(diagramDir, d))
-    );
+    if (isDiagramUpdateDebounced()) {
+      console.error(
+        `Diagrams needing update: ${affectedDiagrams.join(", ")}. Skipped — another update ran within ${DEBOUNCE_SECONDS}s.`
+      );
+    } else {
+      const existingDiagrams = affectedDiagrams.filter((d) =>
+        existsSync(join(diagramDir, d))
+      );
+      const missingDiagrams = affectedDiagrams.filter(
+        (d) => !existsSync(join(diagramDir, d))
+      );
 
-    console.error(
-      `Diagrams needing update: ${affectedDiagrams.join(", ")}. Spawning diagram updater...`
-    );
+      console.error(
+        `Diagrams needing update: ${affectedDiagrams.join(", ")}. Spawning diagram updater...`
+      );
 
-    const diagramPrompt = [
-      `The following source files were changed: ${changedFiles.join(", ")}.`,
-      existingDiagrams.length > 0
-        ? `UPDATE these existing mermaid diagrams in ${DIAGRAM_DIR}/: ${existingDiagrams.join(", ")}. Read each diagram file first, then read the changed source files, and edit only the parts that need updating to reflect the current code.`
-        : "",
-      missingDiagrams.length > 0
-        ? `CREATE these missing diagrams in ${DIAGRAM_DIR}/: ${missingDiagrams.join(", ")}. Read the relevant source files and generate complete mermaid diagrams in markdown.`
-        : "",
-      `Also consider if the changes introduce something that should be in a NEW diagram not yet listed (e.g., a new integration, a new data pipeline, a new auth provider). If so, create it in ${DIAGRAM_DIR}/.`,
-      `Use mermaid syntax inside markdown code blocks. Include tables for quick reference. Prioritize completeness for AI consumption — include every edge case and conditional path.`,
-      `After updating diagrams, stage and commit everything with a concise message.`,
-    ]
-      .filter(Boolean)
-      .join(" ");
+      touchLockFile();
 
-    const child = spawn(
-      "claude",
-      ["-p", "--model", "sonnet", diagramPrompt],
-      {
-        cwd: input.cwd,
-        stdio: "ignore",
-        detached: true,
-      }
-    );
-    child.unref();
+      const diagramPrompt = [
+        `The following source files were changed: ${changedFiles.join(", ")}.`,
+        existingDiagrams.length > 0
+          ? `UPDATE these existing mermaid diagrams in ${DIAGRAM_DIR}/: ${existingDiagrams.join(", ")}. Read each diagram file first, then read the changed source files, and edit only the parts that need updating to reflect the current code.`
+          : "",
+        missingDiagrams.length > 0
+          ? `CREATE these missing diagrams in ${DIAGRAM_DIR}/: ${missingDiagrams.join(", ")}. Read the relevant source files and generate complete mermaid diagrams in markdown.`
+          : "",
+        `Also consider if the changes introduce something that should be in a NEW diagram not yet listed (e.g., a new integration, a new data pipeline, a new auth provider). If so, create it in ${DIAGRAM_DIR}/.`,
+        `Use mermaid syntax inside markdown code blocks. Include tables for quick reference. Prioritize completeness for AI consumption — include every edge case and conditional path.`,
+        `Do NOT commit. Leave the updated diagrams as unstaged changes in the working tree.`,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      const child = spawn(
+        "claude",
+        ["-p", "--model", "sonnet", diagramPrompt],
+        {
+          cwd: input.cwd,
+          stdio: "ignore",
+          detached: true,
+        }
+      );
+      child.unref();
+    }
   } else {
     console.error("All checks passed.");
   }
