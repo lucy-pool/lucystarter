@@ -37,6 +37,13 @@ convex/                          # Backend
   convex.config.ts               # App definition — registers R2 component
   notes.ts                       # Demo CRUD (delete me)
 
+  __tests__/                     # Backend tests (vitest + convex-test)
+    setup.ts                     # Module glob for convex-test
+    helpers.ts                   # createTest, createTestUser, createAdminUser
+    auth.test.ts                 # Auth guard tests (userQuery/adminQuery rejection + acceptance)
+    notes.test.ts                # Notes CRUD + data boundary tests
+    users.test.ts                # Users service tests
+
   email/                         # Email service (deep module)
     send.ts                      # sendEmail, resendEmail (api.email.send.*)
     logs.ts                      # createEmailLog, updateEmailLog, checkIsAdmin, getEmailLogInternal, listEmailLogs
@@ -46,15 +53,23 @@ convex/                          # Backend
     provider.ts                  # "use node" utility — no function exports
     render.ts                    # "use node" utility — no function exports
     builtinTemplates.tsx         # "use node" utility — React Email templates
+    __tests__/                   # Email service tests
+      logs.test.ts               # Email log CRUD + admin access tests
+      templates.test.ts          # Template CRUD + uniqueness + deletion guard tests
+      send.test.ts               # Send flow + resend + auth tests
 
   storage/                       # Storage service (deep module)
     files.ts                     # storeFileMetadata, getMyFiles, deleteFile (api.storage.files.*)
     r2.ts                        # R2 client + clientApi (api.storage.r2.*)
     downloads.ts                 # "use node" — generateDownloadUrl (api.storage.downloads.*)
+    __tests__/                   # Storage tests
+      files.test.ts              # File metadata CRUD + ownership tests
 
   ai/                            # AI service (deep module)
     messages.ts                  # listMessages, saveMessage, clearHistory (api.ai.messages.*)
     chat.ts                      # "use node" — chat action (api.ai.chat.*)
+    __tests__/                   # AI tests
+      messages.test.ts           # Message CRUD + isolation + clear history tests
 
 src/
   proxy.ts                       # Convex Auth middleware — route protection
@@ -90,6 +105,7 @@ src/lib/
 .claude/hooks/
   stop-hook.ts                   # Stop hook: typecheck + lint + MCP error check + diagram updates
   block-*.sh                     # PreToolUse hooks: enforce CLI tool usage rules
+  check-untested-functions.sh    # PreToolUse hook: warn about untested Convex functions on git commit
 
 memory/ai/diagrams/              # Auto-maintained architecture diagrams
   schema.md                      # ER diagram of all tables
@@ -104,11 +120,14 @@ Runs automatically after every Claude Code turn that edits files. Blocks until i
 
 | Check | What it does |
 |-------|-------------|
+| 0. Tests | `bun run test` (only when convex/ files changed) |
 | 1. TypeScript typecheck | `bun run typecheck` |
 | 2. Convex typecheck | Schema vs function signature validation |
 | 3. Unused `_generated` imports | Lint: dead imports in `convex/` |
 | 4. Client-only packages | Lint: React/Next.js imports in `convex/` server code |
 | 5. Next.js MCP errors | Queries `localhost:3000/_next/mcp` for build/runtime errors (skipped if dev server not running) |
+
+**Pre-commit warning:** `check-untested-functions.sh` runs on `git commit` and warns (non-blocking) about exported Convex functions with no test references.
 
 After all checks pass, spawns a background agent to update architecture diagrams.
 
@@ -215,6 +234,7 @@ Auth is enforced **automatically** via custom function builders from `convex/fun
 - [ ] Admin-only query/mutation? Use `adminQuery`/`adminMutation` from `./functions`
 - [ ] New action? Add `ctx.auth.getUserIdentity()` null check at top of handler
 - [ ] New role? Follow "Adding a Role" section below
+- [ ] Tests for new queries/mutations? Add to `convex/<service>/__tests__/`
 
 ## Adding a Feature
 
@@ -223,8 +243,9 @@ Auth is enforced **automatically** via custom function builders from `convex/fun
 3. If Node.js packages needed: create `convex/your-featureActions.ts` with `"use node"`
 4. Create `src/app/(app)/your-feature/page.tsx` (`"use client"` directive)
 5. Add nav entry in `src/components/layout/sidebar.tsx`
-6. Run `bunx convex dev` to push schema
-7. Type-check: `bunx tsc --noEmit`
+6. Add tests in `convex/<service>/__tests__/` for new queries/mutations
+7. Run `bunx convex dev` to push schema
+8. Type-check: `bunx tsc --noEmit`
 
 ## Adding a Role
 

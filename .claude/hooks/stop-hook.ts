@@ -391,6 +391,17 @@ async function main() {
   const changedFiles = getChangedFiles(input.transcript_path);
   if (changedFiles.length === 0) return;
 
+  // --- Check 0: Run tests ---
+  const hasTestChanges = changedFiles.some((f) => f.includes("convex/"));
+  if (hasTestChanges) {
+    console.error("Running tests...");
+    const testResult = await runCommand("bun", ["run", "test"], input.cwd);
+    if (testResult.code !== 0) {
+      block(`Tests failed. Please fix them:\n${testResult.output}`);
+      return;
+    }
+  }
+
   // --- Check 1: TypeScript typecheck ---
   console.error("Running TypeScript typecheck...");
   const tsResult = await runCommand("bun", ["run", "typecheck"], input.cwd);

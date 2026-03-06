@@ -7,7 +7,9 @@
     "build": "bunx convex deploy --cmd 'next build'",
     "start": "next start",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@auth/core": "0.37.4",
@@ -52,6 +54,9 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@types/nodemailer": "^7.0.11"
+    "@edge-runtime/vm": "^5.0.0",
+    "@types/nodemailer": "^7.0.11",
+    "convex-test": "^0.0.41",
+    "vitest": "^4.0.18"
   }
 }
