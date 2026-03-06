@@ -81,8 +81,11 @@ src/components/
     app-shell.tsx                # Sidebar + topbar + content area
     sidebar.tsx                  # Nav items array (extend here)
     topbar.tsx                   # UserMenu + ThemeToggle
-  ui/                            # 16 shadcn/ui components + custom data-grid
+  ui/                            # All shadcn/ui components + custom data-grid
     data-grid/                   # Custom DataGrid component (8 files)
+
+src/hooks/
+  use-mobile.tsx                 # Mobile breakpoint hook (shadcn dependency)
 
 src/lib/
   utils.ts                       # cn() utility

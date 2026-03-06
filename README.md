@@ -11,7 +11,7 @@ A production-ready starter for building full-stack apps with **Convex**, **Next.
 - **AI chat** — OpenRouter integration (OpenAI-compatible). Conversation history, any model.
 - **Backend guards** — Custom function builders (`userQuery`, `userMutation`, `adminQuery`, `adminMutation`) auto-inject `ctx.user` and enforce auth/role checks.
 - **Tests** — Backend test suite using vitest + convex-test. Auth guards, CRUD, data boundaries, email flows.
-- **17 shadcn/ui components** — Button, Card, Dialog, Input, Textarea, Badge, Select, Tabs, Table, Label, Progress, Alert Dialog, Toast, Checkbox, Switch, Dropdown Menu. Add more with `bunx shadcn@latest add [component]`.
+- **All shadcn/ui components** — Every component from the shadcn/ui registry is installed and ready to use.
 
 ### Demo features — copy the patterns, then delete them
 
@@ -171,7 +171,7 @@ src/components/
     app-shell.tsx                # Sidebar + topbar + content
     sidebar.tsx                  # Nav items — add your routes here
     topbar.tsx                   # User menu + theme toggle
-  ui/                            # 17 shadcn/ui components
+  ui/                            # All shadcn/ui components + custom data-grid
 
 tests/convex/                    # Backend tests (vitest + convex-test)
 ```
