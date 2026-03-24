@@ -32,6 +32,38 @@ export const getCurrentUser = query({
   },
 });
 
+/**
+ * Provision an app user record for the current Better Auth session.
+ * Better Auth manages users in its component tables; this creates the
+ * corresponding record in the app's users table on first authenticated access.
+ */
+// eslint-disable-next-line no-restricted-imports -- needs raw mutation for bootstrap
+import { mutation } from "./_generated/server";
+
+export const provisionUser = mutation({
+  args: {},
+  returns: v.union(userValidator, v.null()),
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || !identity.email) return null;
+
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", identity.email!))
+      .unique();
+
+    if (existing) return existing;
+
+    const userId = await ctx.db.insert("users", {
+      email: identity.email,
+      name: identity.name ?? identity.email.split("@")[0],
+      roles: ["user"],
+      createdAt: Date.now(),
+    });
+    return await ctx.db.get(userId);
+  },
+});
+
 /** Update the current user's profile. */
 export const updateProfile = userMutation({
   args: {

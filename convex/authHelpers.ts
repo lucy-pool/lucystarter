@@ -53,10 +53,21 @@ export async function getCurrentUser(
     );
   }
 
-  const user = await ctx.db
+  let user = await ctx.db
     .query("users")
     .withIndex("by_email", (q) => q.eq("email", email))
     .unique();
+
+  // Better Auth manages users in its component tables. On first authenticated
+  // request, auto-create the app user record to bridge the two systems.
+  if (!user && "insert" in ctx.db) {
+    const userId = await (ctx as MutationCtx).db.insert("users", {
+      email,
+      name: identity.name ?? email.split("@")[0],
+      roles: ["user"],
+    });
+    user = await (ctx as MutationCtx).db.get(userId);
+  }
 
   if (!user) {
     throw new NotFoundError(

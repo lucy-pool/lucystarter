@@ -9,10 +9,10 @@ export default defineConfig({
   },
   plugins: [tanstackStart(), react()],
   resolve: {
-    alias: {
-      "@/": path.resolve(__dirname, "./src") + "/",
-      "@/convex/": path.resolve(__dirname, "./convex") + "/",
-    },
+    alias: [
+      { find: "@/convex", replacement: path.resolve(__dirname, "./convex") },
+      { find: "@/", replacement: path.resolve(__dirname, "./src") + "/" },
+    ],
   },
   ssr: {
     noExternal: ["@convex-dev/better-auth"],
