@@ -13,8 +13,17 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppNotesRouteImport } from './routes/_app/notes'
+import { Route as AppFilesRouteImport } from './routes/_app/files'
+import { Route as AppDataGridDemoRouteImport } from './routes/_app/data-grid-demo'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppAiChatRouteImport } from './routes/_app/ai-chat'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
+import { Route as AppAdminEmailsRouteImport } from './routes/_app/admin/emails'
+import { Route as AppAdminEmailTemplatesRouteImport } from './routes/_app/admin/email-templates'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -36,87 +45,180 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppNotesRoute = AppNotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFilesRoute = AppFilesRouteImport.update({
+  id: '/files',
+  path: '/files',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDataGridDemoRoute = AppDataGridDemoRouteImport.update({
+  id: '/data-grid-demo',
+  path: '/data-grid-demo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAiChatRoute = AppAiChatRouteImport.update({
+  id: '/ai-chat',
+  path: '/ai-chat',
+  getParentRoute: () => AppRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminEmailsRoute = AppAdminEmailsRouteImport.update({
+  id: '/admin/emails',
+  path: '/admin/emails',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminEmailTemplatesRoute = AppAdminEmailTemplatesRouteImport.update({
+  id: '/admin/email-templates',
+  path: '/admin/email-templates',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/ai-chat': typeof AppAiChatRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/data-grid-demo': typeof AppDataGridDemoRoute
+  '/files': typeof AppFilesRoute
+  '/notes': typeof AppNotesRoute
+  '/admin/email-templates': typeof AppAdminEmailTemplatesRoute
+  '/admin/emails': typeof AppAdminEmailsRoute
+  '/admin/users': typeof AppAdminUsersRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/ai-chat': typeof AppAiChatRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/data-grid-demo': typeof AppDataGridDemoRoute
+  '/files': typeof AppFilesRoute
+  '/notes': typeof AppNotesRoute
+  '/admin/email-templates': typeof AppAdminEmailTemplatesRoute
+  '/admin/emails': typeof AppAdminEmailsRoute
+  '/admin/users': typeof AppAdminUsersRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_app': typeof AppRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/_app/ai-chat': typeof AppAiChatRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/data-grid-demo': typeof AppDataGridDemoRoute
+  '/_app/files': typeof AppFilesRoute
+  '/_app/notes': typeof AppNotesRoute
+  '/_app/admin/email-templates': typeof AppAdminEmailTemplatesRoute
+  '/_app/admin/emails': typeof AppAdminEmailsRoute
+  '/_app/admin/users': typeof AppAdminUsersRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/auth/$' | '/forgot-password' | '/reset-password' | '/signin' | '/signup'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/signin'
+    | '/signup'
+    | '/ai-chat'
+    | '/dashboard'
+    | '/data-grid-demo'
+    | '/files'
+    | '/notes'
+    | '/admin/email-templates'
+    | '/admin/emails'
+    | '/admin/users'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/auth/$' | '/forgot-password' | '/reset-password' | '/signin' | '/signup'
-  id: '__root__' | '/' | '/api/auth/$' | '/forgot-password' | '/reset-password' | '/signin' | '/signup'
+  to:
+    | '/'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/signin'
+    | '/signup'
+    | '/ai-chat'
+    | '/dashboard'
+    | '/data-grid-demo'
+    | '/files'
+    | '/notes'
+    | '/admin/email-templates'
+    | '/admin/emails'
+    | '/admin/users'
+    | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/signin'
+    | '/signup'
+    | '/_app/ai-chat'
+    | '/_app/dashboard'
+    | '/_app/data-grid-demo'
+    | '/_app/files'
+    | '/_app/notes'
+    | '/_app/admin/email-templates'
+    | '/_app/admin/emails'
+    | '/_app/admin/users'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  AppRoute: typeof AppRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signin': {
@@ -126,23 +228,132 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/notes': {
+      id: '/_app/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof AppNotesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/files': {
+      id: '/_app/files'
+      path: '/files'
+      fullPath: '/files'
+      preLoaderRoute: typeof AppFilesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/data-grid-demo': {
+      id: '/_app/data-grid-demo'
+      path: '/data-grid-demo'
+      fullPath: '/data-grid-demo'
+      preLoaderRoute: typeof AppDataGridDemoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/ai-chat': {
+      id: '/_app/ai-chat'
+      path: '/ai-chat'
+      fullPath: '/ai-chat'
+      preLoaderRoute: typeof AppAiChatRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/admin/users': {
+      id: '/_app/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AppAdminUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin/emails': {
+      id: '/_app/admin/emails'
+      path: '/admin/emails'
+      fullPath: '/admin/emails'
+      preLoaderRoute: typeof AppAdminEmailsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin/email-templates': {
+      id: '/_app/admin/email-templates'
+      path: '/admin/email-templates'
+      fullPath: '/admin/email-templates'
+      preLoaderRoute: typeof AppAdminEmailTemplatesRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppAiChatRoute: typeof AppAiChatRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppDataGridDemoRoute: typeof AppDataGridDemoRoute
+  AppFilesRoute: typeof AppFilesRoute
+  AppNotesRoute: typeof AppNotesRoute
+  AppAdminEmailTemplatesRoute: typeof AppAdminEmailTemplatesRoute
+  AppAdminEmailsRoute: typeof AppAdminEmailsRoute
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAiChatRoute: AppAiChatRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppDataGridDemoRoute: AppDataGridDemoRoute,
+  AppFilesRoute: AppFilesRoute,
+  AppNotesRoute: AppNotesRoute,
+  AppAdminEmailTemplatesRoute: AppAdminEmailTemplatesRoute,
+  AppAdminEmailsRoute: AppAdminEmailsRoute,
+  AppAdminUsersRoute: AppAdminUsersRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  AppRoute: AppRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
