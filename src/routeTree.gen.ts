@@ -20,7 +20,6 @@ import { Route as AppFilesRouteImport } from './routes/_app/files'
 import { Route as AppDataGridDemoRouteImport } from './routes/_app/data-grid-demo'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppAiChatRouteImport } from './routes/_app/ai-chat'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
 import { Route as AppAdminEmailsRouteImport } from './routes/_app/admin/emails'
 import { Route as AppAdminEmailTemplatesRouteImport } from './routes/_app/admin/email-templates'
@@ -79,11 +78,6 @@ const AppAiChatRoute = AppAiChatRouteImport.update({
   path: '/ai-chat',
   getParentRoute: () => AppRoute,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
   id: '/admin/users',
   path: '/admin/users',
@@ -114,7 +108,6 @@ export interface FileRoutesByFullPath {
   '/admin/email-templates': typeof AppAdminEmailTemplatesRoute
   '/admin/emails': typeof AppAdminEmailsRoute
   '/admin/users': typeof AppAdminUsersRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -130,7 +123,6 @@ export interface FileRoutesByTo {
   '/admin/email-templates': typeof AppAdminEmailTemplatesRoute
   '/admin/emails': typeof AppAdminEmailsRoute
   '/admin/users': typeof AppAdminUsersRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -148,7 +140,6 @@ export interface FileRoutesById {
   '/_app/admin/email-templates': typeof AppAdminEmailTemplatesRoute
   '/_app/admin/emails': typeof AppAdminEmailsRoute
   '/_app/admin/users': typeof AppAdminUsersRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -166,7 +157,6 @@ export interface FileRouteTypes {
     | '/admin/email-templates'
     | '/admin/emails'
     | '/admin/users'
-    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -182,7 +172,6 @@ export interface FileRouteTypes {
     | '/admin/email-templates'
     | '/admin/emails'
     | '/admin/users'
-    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
@@ -199,7 +188,6 @@ export interface FileRouteTypes {
     | '/_app/admin/email-templates'
     | '/_app/admin/emails'
     | '/_app/admin/users'
-    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -209,7 +197,6 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -291,13 +278,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAiChatRouteImport
       parentRoute: typeof AppRoute
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_app/admin/users': {
       id: '/_app/admin/users'
       path: '/admin/users'
@@ -353,7 +333,6 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
