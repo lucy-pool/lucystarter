@@ -9,6 +9,7 @@
 # build output
 /dist
 /.output
+/.wrangler
 
 # misc
 .DS_Store
