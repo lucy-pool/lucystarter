@@ -1,8 +1,19 @@
-import nextConfig from "eslint-config-next";
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
-  ...nextConfig,
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ["src/**/*.{ts,tsx}", "convex/**/*.ts"],
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+        sourceType: "module",
+      },
+    },
+  },
   {
     files: ["convex/**/*.ts"],
     rules: {
@@ -20,5 +31,24 @@ export default [
         },
       ],
     },
+  },
+  {
+    files: ["src/**/*.{ts,tsx}", "convex/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+    },
+  },
+  {
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  {
+    ignores: ["node_modules/", "dist/", "functions/", ".output/", "src/routeTree.gen.ts"],
   },
 ];

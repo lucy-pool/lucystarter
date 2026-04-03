@@ -1,6 +1,5 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { authTables } from "@convex-dev/auth/server";
 
 // ── Role values ─────────────────────────────────────────────────────
 // Update these when you add your own roles.
@@ -15,6 +14,12 @@ export const fileTypeValidator = v.union(
   v.literal("audio"),
   v.literal("document"),
   v.literal("image")
+);
+
+// ── File upload status ─────────────────────────────────────────────
+export const fileUploadStatusValidator = v.union(
+  v.literal("pending"),
+  v.literal("complete")
 );
 
 // ── Message role values ─────────────────────────────────────────────
@@ -43,7 +48,8 @@ export const emailTemplateValidator = v.union(
 );
 
 export default defineSchema({
-  ...authTables,
+  // Better Auth manages auth tables (user, session, account, etc.) internally
+  // via the component. Only the app's users table with custom fields is defined here.
   users: defineTable({
     name: v.optional(v.string()),
     email: v.optional(v.string()),
@@ -61,15 +67,18 @@ export default defineSchema({
   // Actual files live in Cloudflare R2. This table tracks metadata only.
   fileMetadata: defineTable({
     fileName: v.string(),
-    storageKey: v.string(),
+    storageKey: v.optional(v.string()),
     mimeType: v.string(),
     size: v.number(),
     fileType: fileTypeValidator,
+    status: v.optional(fileUploadStatusValidator),
     createdBy: v.id("users"),
     createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
   })
     .index("by_created_by", ["createdBy"])
-    .index("by_file_type", ["fileType"]),
+    .index("by_file_type", ["fileType"])
+    .index("by_status", ["status"]),
 
   // ── AI chat messages ────────────────────────────────────────────
   // Stores conversation history for the AI chat demo.
