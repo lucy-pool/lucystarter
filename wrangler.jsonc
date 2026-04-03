@@ -2,5 +2,12 @@
   "name": "lucystarter",
   "compatibility_date": "2025-04-01",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry"
+  "main": "@tanstack/react-start/server-entry",
+
+  // Acceptance environment — deploy with: wrangler deploy --env acc
+  "env": {
+    "acc": {
+      "name": "lucystarter-acc"
+    }
+  }
 }

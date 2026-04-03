@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
-      ...(mode === "production"
+      ...(mode === "production" && process.env.DEPLOY_TARGET !== "vps"
         ? [cloudflare({ viteEnvironment: { name: "ssr" } })]
         : []),
       tanstackStart(),
