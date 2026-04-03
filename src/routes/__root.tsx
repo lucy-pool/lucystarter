@@ -6,13 +6,19 @@ import {
   createRootRouteWithContext,
 } from "@tanstack/react-router";
 import * as React from "react";
+import { createServerFn } from "@tanstack/react-start";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import type { ConvexQueryClient } from "@convex-dev/react-query";
 import type { QueryClient } from "@tanstack/react-query";
 import appCss from "@/styles/globals.css?url";
 import { authClient } from "@/lib/auth-client";
+import { getToken } from "@/lib/auth-server";
 import { ThemeProvider } from "@/components/providers";
 import { Toaster } from "@/components/ui/toaster";
+
+const getAuth = createServerFn({ method: "GET" }).handler(async () => {
+  return await getToken();
+});
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -36,6 +42,13 @@ export const Route = createRootRouteWithContext<{
       { rel: "icon", href: "/favicon.ico" },
     ],
   }),
+  beforeLoad: async (ctx) => {
+    const token = await getAuth();
+    if (token) {
+      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
+    }
+    return { isAuthenticated: !!token, token };
+  },
   component: RootComponent,
 });
 
@@ -45,6 +58,7 @@ function RootComponent() {
     <ConvexBetterAuthProvider
       client={context.convexQueryClient.convexClient}
       authClient={authClient}
+      initialToken={context.token}
     >
       <RootDocument>
         <ThemeProvider>
