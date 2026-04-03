@@ -33,7 +33,8 @@ functions/                       # Cloudflare Pages Functions
 vite.config.ts                   # Vite + TanStack Start plugin config
 
 convex/                          # Backend
-  schema.ts                      # Tables, indexes, role + fileType validators + betterAuth tables
+  schema.ts                      # Tables, indexes, role + fileType + uploadStatus validators + betterAuth tables
+  crons.ts                       # Cron jobs — cleanupOrphanedRecords every 30 min
   auth.ts                        # Better Auth config (Email/Password, GitHub, Google)
   auth.config.ts                 # Better Auth JWT config via @convex-dev/better-auth
   authHelpers.ts                 # Auth guards (requireAuth, requireAdmin, hasRole)
@@ -54,7 +55,7 @@ convex/                          # Backend
     builtinTemplates.tsx         # "use node" utility — React Email templates
 
   storage/                       # Storage service (deep module)
-    files.ts                     # storeFileMetadata, getMyFiles, deleteFile (api.storage.files.*)
+    files.ts                     # createPendingFile, confirmUpload, getMyFiles, deleteFile, cleanupOrphanedRecords
     r2.ts                        # R2 client + clientApi (api.storage.r2.*)
     downloads.ts                 # "use node" — generateDownloadUrl (api.storage.downloads.*)
 
@@ -76,7 +77,7 @@ src/routes/                      # Frontend (file-based routing via TanStack Rou
   _app/                          # Protected routes (children of _app layout)
     dashboard.tsx                # Welcome + demo links
     notes.tsx                    # Demo: CRUD (delete me)
-    files.tsx                    # Demo: R2 upload (delete me)
+    files.tsx                    # Demo: R2 upload with pending/complete lifecycle (delete me)
     ai-chat.tsx                  # Demo: OpenRouter chat (delete me)
     data-grid-demo.tsx           # Demo: DataGrid component showcase
     admin/
@@ -121,7 +122,7 @@ tests/convex/                    # Backend tests (vitest + convex-test)
   ai/
     messages.test.ts             # Message CRUD + isolation + clear history tests
   storage/
-    files.test.ts                # File metadata CRUD + ownership tests
+    files.test.ts                # File metadata CRUD + ownership + pending/complete lifecycle tests
   email/
     logs.test.ts                 # Email log CRUD + admin access tests
     templates.test.ts            # Template CRUD + uniqueness + deletion guard tests
@@ -234,6 +235,21 @@ Auth is enforced **automatically** via custom function builders from `convex/fun
 5. Add nav entry in `src/components/layout/sidebar.tsx`
 6. Add tests in `tests/convex/<service>/` for new queries/mutations
 7. Follow "Greybox at Planning Time" checklist above for new modules
+
+## File Upload Flow
+
+Uploads use a two-phase lifecycle for reliability:
+
+```
+Browser → createPendingFile (mutation, status:"pending")
+       → uploadFile via @convex-dev/r2 (direct PUT to R2, returns storageKey)
+       → confirmUpload (mutation, attaches storageKey, status:"complete")
+```
+
+- `getMyFiles` only returns `complete` files (pending uploads are invisible)
+- If upload fails or is abandoned, the record stays `pending`
+- A cron job (`convex/crons.ts`) runs every 30 minutes to delete stale `pending` records
+- Legacy records (no `status` field) are treated as `complete`
 
 ## Adding a Role
 
