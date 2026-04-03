@@ -76,4 +76,84 @@ describe("Storage files", () => {
       asBob.mutation(api.storage.files.deleteFile, { fileId })
     ).rejects.toThrow(/not authorized/i);
   });
+
+  it("pending files are not visible in getMyFiles", async () => {
+    const t = createTest();
+    const { asUser } = await createTestUser(t);
+
+    await asUser.mutation(api.storage.files.createPendingFile, {
+      fileName: "uploading.png",
+      mimeType: "image/png",
+      size: 5000,
+      fileType: "image",
+    });
+
+    const files = await asUser.query(api.storage.files.getMyFiles, {});
+    expect(files).toHaveLength(0);
+  });
+
+  it("confirmed files are visible in getMyFiles", async () => {
+    const t = createTest();
+    const { asUser } = await createTestUser(t);
+
+    const fileId = await asUser.mutation(api.storage.files.createPendingFile, {
+      fileName: "photo.jpg",
+      mimeType: "image/jpeg",
+      size: 8000,
+      fileType: "image",
+    });
+
+    await asUser.mutation(api.storage.files.confirmUpload, {
+      fileId,
+      storageKey: "uploads/photo.jpg",
+    });
+
+    const files = await asUser.query(api.storage.files.getMyFiles, {});
+    expect(files).toHaveLength(1);
+    expect(files[0].fileName).toBe("photo.jpg");
+    expect(files[0].storageKey).toBe("uploads/photo.jpg");
+    expect(files[0].status).toBe("complete");
+  });
+
+  it("only file owner can confirm upload", async () => {
+    const t = createTest();
+    const { asUser: asAlice } = await createTestUser(t, { name: "Alice" });
+    const { asUser: asBob } = await createTestUser(t, { name: "Bob" });
+
+    const fileId = await asAlice.mutation(api.storage.files.createPendingFile, {
+      fileName: "alice-file.png",
+      mimeType: "image/png",
+      size: 1000,
+      fileType: "image",
+    });
+
+    await expect(
+      asBob.mutation(api.storage.files.confirmUpload, {
+        fileId,
+        storageKey: "uploads/alice-file.png",
+      })
+    ).rejects.toThrow(/not authorized/i);
+  });
+
+  it("existing records without status still appear in getMyFiles", async () => {
+    const t = createTest();
+    const { asUser, userId } = await createTestUser(t);
+
+    // Insert a legacy record directly (no status field)
+    await t.run(async (ctx) => {
+      await ctx.db.insert("fileMetadata", {
+        fileName: "legacy.pdf",
+        storageKey: "uploads/legacy.pdf",
+        mimeType: "application/pdf",
+        size: 2000,
+        fileType: "document",
+        createdBy: userId,
+        createdAt: Date.now(),
+      });
+    });
+
+    const files = await asUser.query(api.storage.files.getMyFiles, {});
+    expect(files).toHaveLength(1);
+    expect(files[0].fileName).toBe("legacy.pdf");
+  });
 });

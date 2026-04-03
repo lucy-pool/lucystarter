@@ -177,7 +177,7 @@ function FilesPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDownload(file.storageKey, file.fileName)}
+                      onClick={() => file.storageKey && handleDownload(file.storageKey, file.fileName)}
                     >
                       <Download className="h-4 w-4" />
                     </Button>
