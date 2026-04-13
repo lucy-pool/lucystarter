@@ -29,8 +29,8 @@
 
 ```
 wrangler.jsonc                   # Cloudflare Workers deployment config
-
 vite.config.ts                   # Vite + TanStack Start plugin config
+.worktreeinclude                 # Copies .env.local to git worktrees
 
 convex/                          # Backend
   schema.ts                      # Tables, indexes, role + fileType + uploadStatus validators + betterAuth tables
@@ -109,11 +109,31 @@ src/lib/
 src/styles/
   globals.css                    # Global CSS (Tailwind + custom properties)
 
-.claude/hooks/
-  stop-hook.ts                   # Stop hook: typecheck + lint + MCP error check + diagram updates
-  block-*.sh                     # PreToolUse hooks: enforce CLI tool usage rules
-  check-untested-functions.sh    # PreToolUse hook: warn about untested Convex functions on git commit
-  check-temporal-coupling.sh     # PreToolUse hook: warn about cross-module temporal coupling on git commit
+.claude/
+  rules/                         # Path-scoped instructions (load only when matching files are touched)
+    convex-queries.md            # Always loaded — index-first query rules
+    convex-runtime.md            # convex/**  — runtime constraints (no fetch in mutations, split pattern)
+    auth-guards.md               # convex/** + src/routes/** — userQuery/userMutation, route placement
+    testing.md                   # tests/**   — convex-test helpers, test-at-the-seam conventions
+    file-upload.md               # convex/storage/** — two-phase pending/complete lifecycle
+    schema-changes.md            # convex/schema.ts — v.optional() for new fields, index ordering
+
+  agents/                        # Subagents with restricted tool access
+    code-reviewer.md             # Read-only — reviews against project conventions + auth checklist
+    security-auditor.md          # Read-only — finds auth bypasses, data leaks, exposed internals
+
+  hooks/                         # Hook scripts (see Hook System below)
+    stop-hook.ts                 # Stop: typecheck + lint + diagram updates (spawns background updater)
+    diagram-watches.ts           # Library: content-derived watch resolution (imported by other hooks)
+    block-commands.sh            # PreToolUse/Bash: blocks cat/grep/find/ls/npm/rm-rf etc.
+    check-convex-env.sh          # PreToolUse/Bash: validates env vars before convex dev
+    check-untested-functions.sh  # PreToolUse/Bash: warns about new untested functions on git commit
+    check-temporal-coupling.sh   # PreToolUse/Bash: warns about cross-module temporal coupling
+    check-diagrams.ts            # PreToolUse/Bash: fixes stale diagrams before git commit
+    check-docs-sync.sh           # PreToolUse/Bash: warns about in-flight diagram updates
+    convex-query-lint.ts         # PostToolUse: per-chain .withIndex()/.collect() lint
+    convex-schema-lint.ts        # PostToolUse: warns about new required fields in schema.ts
+    convex-node-lint.ts          # PostToolUse: blocks query/mutation exports from "use node" files
 
 tests/convex/                    # Backend tests (vitest + convex-test)
   setup.ts                       # Module glob for convex-test
@@ -137,6 +157,7 @@ memory/ai/diagrams/              # Auto-maintained architecture diagrams
   auth-flow.md                   # Authentication sequence diagrams
   data-flow.md                   # Client → Convex → R2/OpenRouter data flow
   greybox.md                     # Deep module boundaries, public APIs vs internals
+  hooks-loop.md                  # Hook system change loop + doc alignment flow
 ```
 
 ## Design Principles
