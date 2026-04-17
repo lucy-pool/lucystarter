@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "preview": "bun run build && vite preview",
     "start": "node server-node.mjs",
     "deploy": "wrangler deploy",
+    "cf-typegen": "wrangler types",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
