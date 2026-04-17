@@ -297,26 +297,28 @@ If you don't want any of this, delete `.claude/hooks/stop-hook.ts` or remove the
 
 ## Environment Variables
 
-| Variable | Where to set | Description |
-|----------|-------------|-------------|
-| `CONVEX_DEPLOYMENT` | `.env.local` | Auto-set by `bunx convex dev` |
-| `VITE_CONVEX_URL` | `.env.local` | Auto-set by `bunx convex dev` |
-| `VITE_CONVEX_SITE_URL` | `.env.local` | Convex HTTP actions URL (for auth proxy) |
-| `VITE_SITE_URL` | `.env.local` | Frontend URL (e.g. `http://localhost:3000`) |
-| `BETTER_AUTH_SECRET` | Convex dashboard | Secret for Better Auth session signing |
-| `SITE_URL` | Convex dashboard | Better Auth base URL |
-| `R2_ENDPOINT` | Convex dashboard | Cloudflare R2 S3-compatible endpoint |
-| `R2_ACCESS_KEY_ID` | Convex dashboard | R2 API token access key |
-| `R2_SECRET_ACCESS_KEY` | Convex dashboard | R2 API token secret |
-| `R2_BUCKET` | Convex dashboard | R2 bucket name |
-| `OPENROUTER_API_KEY` | Convex dashboard | OpenRouter API key |
-| `DEFAULT_OPENROUTER_MODEL` | Convex dashboard | Default model (default: devstral free) |
-| `RESEND_API_KEY` | Convex dashboard | Resend API key (if using Resend) |
-| `EMAIL_FROM` | Convex dashboard | Sender address for emails |
-| `SMTP_HOST` | Convex dashboard | SMTP server host (if using SMTP) |
-| `SMTP_PORT` | Convex dashboard | SMTP port |
-| `SMTP_USER` | Convex dashboard | SMTP username |
-| `SMTP_PASS` | Convex dashboard | SMTP password |
+Three systems need config. The table tells you which knob sets which.
+
+| Variable | System | Required? | Description |
+|----------|--------|-----------|-------------|
+| `CONVEX_DEPLOYMENT` | `.env.local` | yes (dev) | Auto-set by `bunx convex dev` |
+| `VITE_CONVEX_URL` | `.env.local` (dev) / Worker var (prod) | yes | Convex deployment URL — read by both the client bundle and the Worker at runtime. CI wires this via `convex deploy --cmd-url-env-var-name` + `wrangler --var`. |
+| `VITE_CONVEX_SITE_URL` | `.env.local` (dev) / Worker var (prod) | yes | Convex HTTP actions URL (for the auth proxy) |
+| `VITE_SITE_URL` | `.env.local` | yes (dev) | Frontend URL (e.g. `http://localhost:3000`) |
+| `BETTER_AUTH_SECRET` | Convex dashboard | yes | Secret for Better Auth session signing |
+| `SITE_URL` | Convex dashboard | yes | Better Auth base URL |
+| `R2_ENDPOINT` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET` | Convex dashboard | no | R2 file uploads |
+| `OPENROUTER_API_KEY` / `DEFAULT_OPENROUTER_MODEL` | Convex dashboard | no | AI chat |
+| `RESEND_API_KEY` / `EMAIL_FROM` | Convex dashboard | no | Email (Resend) |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | Convex dashboard | no | Email (SMTP) |
+| `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` | GitHub Actions secrets | yes (CI) | For `wrangler deploy` |
+| `CONVEX_DEPLOY_KEY_PROD` / `CONVEX_DEPLOY_KEY_ACC` | GitHub Actions secrets | yes (CI) | For `convex deploy` per environment |
+
+**What runs where:**
+- **`.env.local`** — read by Vite dev server and `bunx convex dev` locally. Not committed.
+- **Convex dashboard** — read by Convex functions/actions (`process.env.X` in `convex/`).
+- **Worker `--var`** — set by `wrangler deploy --var` in CI. Read by server-side TanStack Start code running inside the Worker (`process.env.X` in `src/lib/auth-server.ts` etc.).
+- **GitHub Actions secrets** — read by `.github/workflows/deploy.yml` only.
 
 ## Troubleshooting
 

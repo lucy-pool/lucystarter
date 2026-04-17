@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AppNotesRouteImport } from './routes/_app/notes'
 import { Route as AppFilesRouteImport } from './routes/_app/files'
 import { Route as AppDataGridDemoRouteImport } from './routes/_app/data-grid-demo'
@@ -52,6 +53,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppNotesRoute = AppNotesRouteImport.update({
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/data-grid-demo': typeof AppDataGridDemoRoute
   '/files': typeof AppFilesRoute
   '/notes': typeof AppNotesRoute
+  '/api/health': typeof ApiHealthRoute
   '/admin/email-templates': typeof AppAdminEmailTemplatesRoute
   '/admin/emails': typeof AppAdminEmailsRoute
   '/admin/users': typeof AppAdminUsersRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/data-grid-demo': typeof AppDataGridDemoRoute
   '/files': typeof AppFilesRoute
   '/notes': typeof AppNotesRoute
+  '/api/health': typeof ApiHealthRoute
   '/admin/email-templates': typeof AppAdminEmailTemplatesRoute
   '/admin/emails': typeof AppAdminEmailsRoute
   '/admin/users': typeof AppAdminUsersRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/_app/data-grid-demo': typeof AppDataGridDemoRoute
   '/_app/files': typeof AppFilesRoute
   '/_app/notes': typeof AppNotesRoute
+  '/api/health': typeof ApiHealthRoute
   '/_app/admin/email-templates': typeof AppAdminEmailTemplatesRoute
   '/_app/admin/emails': typeof AppAdminEmailsRoute
   '/_app/admin/users': typeof AppAdminUsersRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/data-grid-demo'
     | '/files'
     | '/notes'
+    | '/api/health'
     | '/admin/email-templates'
     | '/admin/emails'
     | '/admin/users'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/data-grid-demo'
     | '/files'
     | '/notes'
+    | '/api/health'
     | '/admin/email-templates'
     | '/admin/emails'
     | '/admin/users'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/_app/data-grid-demo'
     | '/_app/files'
     | '/_app/notes'
+    | '/api/health'
     | '/_app/admin/email-templates'
     | '/_app/admin/emails'
     | '/_app/admin/users'
@@ -209,6 +221,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -254,6 +267,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/notes': {
@@ -353,6 +373,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  ApiHealthRoute: ApiHealthRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
